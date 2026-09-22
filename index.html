@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Designing robot tools from scratch through behavior-aware structural search and continuous shape-action optimization, validated in simulation and on a real robot.">
+  <meta name="keywords" content="Robot tool design, hierarchical optimization, structural search, differentiable simulation, tool use, sim-to-real">
+  <title>Robot Tool Design from Scratch via Behavior-Aware Hierarchical Optimization</title>
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script defer src="./static/js/index.js"></script>
+  <link rel="stylesheet" href="./static/css/intro.css">
+  <script defer src="./static/js/intro.js"></script>
+  <style>
+    .media-placeholder { display: flex; align-items: center; justify-content: center; min-height: 220px; padding: 2rem; margin: 1.5rem 0; background: #f5f5f5; border: 1px dashed #dbdbdb; border-radius: 4px; color: #767676; text-align: center; }
+    .publication-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+    .paper-figure, .content figure.paper-figure { margin: 1.5rem 0; text-align: center; }
+    .paper-figure img { display: block; width: 100%; height: auto; }
+    .simulation-video { display: block; width: 100%; height: auto; background: #fff; }
+    .simulation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.5rem; }
+    .simulation-nav { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+    .simulation-nav button { font-size: 1.5rem; width: 2.5rem; height: 2.5rem; }
+    @media (max-width: 600px) { .simulation-grid { grid-template-columns: 1fr; } }
+    section { scroll-margin-top: 1rem; }
+  </style>
+  <link rel="stylesheet" href="./static/css/cursor.css">
+  <link rel="preload" href="./static/fonts/linux-libertine/LinLibertine_R.otf" as="font" type="font/otf" crossorigin>
+  <link rel="stylesheet" href="./static/css/typography.css">
+</head>
+<body>
+<section class="intro" aria-label="HOT: structure, shape, and action">
+  <div class="intro-stage">
+    <div class="intro-media">
+      <video class="intro-video is-active" controls muted playsinline preload="auto" poster="./static/images/intro/layers-start.webp" aria-label="HOT: structure, shape, and action" data-clip="0">
+        <source src="./static/videos/01_Layers_4K60.mp4" type="video/mp4">
+      </video>
+      <video class="intro-video" muted playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
+    </div>
+    <div class="intro-top"><span class="intro-brand">HOT</span><a class="intro-skip" href="#paper">Skip intro <span aria-hidden="true">↗</span></a></div>
+    <div class="intro-note" aria-live="polite" aria-atomic="true" aria-hidden="true">
+      <p class="intro-note-text"></p>
+    </div>
+    <button class="intro-play button is-rounded" type="button" hidden>Play animation</button>
+    <div class="intro-bottom">
+      <p class="intro-cue"><span class="intro-cue-text">Scroll to explore</span><span aria-hidden="true">↓</span></p>
+    </div>
+  </div>
+</section>
+<nav id="paper" class="navbar" role="navigation" aria-label="main navigation" tabindex="-1">
+  <div class="navbar-brand"><button class="navbar-burger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-menu"><span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span></button>
+</div>
+  <div class="navbar-menu" id="site-menu">
+<div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+    <div class="navbar-item has-dropdown is-hoverable"><a class="navbar-link" href="#abstract">Project Overview</a>
+<div class="navbar-dropdown">
+      <a class="navbar-item" href="#method">Method</a><a class="navbar-item" href="#results">Simulation Experiments</a><a class="navbar-item" href="#real-world">Real-World Experiments</a>
+    </div>
+</div>
+  </div>
+</div>
+</nav>
+<section class="hero">
+<div class="hero-body">
+<div class="container is-max-desktop">
+<div class="columns is-centered">
+<div class="column has-text-centered">
+<h1 class="title is-1 publication-title">Robot Tool Design from Scratch<br>via Behavior-Aware Hierarchical Optimization</h1>
+<div class="is-size-5 publication-authors"><span class="author-block"><a href="https://yinghanchen.com">Yinghan Chen</a><sup>1,2,3,4,5,*</sup></span>,
+<span class="author-block"><a href="https://www.xiyaotian.tech">Xiyao Tian</a><sup>1,2,3,4,5,*</sup></span>,
+<span class="author-block"><a href="https://www.tongclass.ac.cn/members/daiyizan">Yizan Dai</a><sup>1,2,3,4,5</sup></span>,
+<span class="author-block"><a href="https://yuyangli.com">Yuyang Li</a><sup>1,2,4,5,†</sup></span>,
+<span class="author-block"><a href="https://yzhu.io/">Yixin Zhu</a><sup>2,1,4,5,6,7,†</sup></span>
+</div>
+<div class="is-size-5 publication-authors"><span class="author-block"><sup>1</sup>Institute for AI, Peking University</span><br>
+<span class="author-block"><sup>2</sup>School of Psychological and Cognitive Sciences, Peking University</span><br>
+<span class="author-block"><sup>3</sup>Yuanpei College, Peking University</span><br>
+<span class="author-block"><sup>4</sup>Beijing Key Laboratory of Brain-Computer Interface and Mental Health Modulation, Peking University</span><br>
+<span class="author-block"><sup>5</sup>State Key Laboratory for General AI, Peking University</span><br>
+<span class="author-block"><sup>6</sup>Embodied Intelligence Lab, PKU-Wuhan Institute for AI</span><br>
+<span class="author-block"><sup>7</sup>XS Vision</span><br><span class="eql-cntrb"><small><br><sup>*</sup> Equal contributors. &nbsp; <sup>†</sup> Corresponding author.</small></span>
+</div>
+<div class="column has-text-centered">
+<div class="publication-links">
+<span class="link-block"><button type="button" class="external-link button is-normal is-rounded is-dark" disabled title="Link coming soon"><span class="icon"><i class="ai ai-arxiv" aria-hidden="true"></i></span><span>arXiv</span></button></span>
+<span class="link-block"><button type="button" class="external-link button is-normal is-rounded is-dark" disabled title="Link coming soon"><span class="icon"><i class="fab fa-github" aria-hidden="true"></i></span><span>Code</span></button></span>
+<span class="link-block"><button type="button" class="external-link button is-normal is-rounded is-dark" disabled title="Link coming soon"><span class="icon"><i class="fas fa-video" aria-hidden="true"></i></span><span>Video</span></button></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="section" id="abstract">
+<div class="container is-max-desktop">
+<figure class="paper-figure"><a href="./static/images/fig_teaser.png" target="_blank" rel="noopener" aria-label="Open full-size figure: HOT jointly designs tool structure, shape, and action across four physical tasks."><img src="./static/images/fig_teaser.png" alt="HOT jointly designs tool structure, shape, and action across four physical tasks." width="2400" height="676" loading="eager" decoding="async"></a></figure>
+<h2 class="title is-3 has-text-centered">Abstract</h2>
+<div class="content has-text-justified">
+<p>The ability to design a tool for a task marks a level of intelligence beyond merely understanding, selecting, or using one. Existing methods for robotic tool design typically optimize a tool&#x27;s continuous shape and action within a structure that is prescribed or generated beforehand, so the structure itself stays outside the physical optimization loop. We study task-driven tool design from scratch, where tool structure, shape, and action are all derived from the desired physical outcome. Here we show that the three elements can be designed jointly by HOT, a hierarchical optimization whose upper level searches over discrete tool structures with BASS, while lower-level physical optimization evaluates their task behavior and returns milestone progress as behavioral evidence for the search, ultimately providing jointly optimized shape and action. On four tool-use tasks with distinct physical functions, HOT discovers functional structures after evaluating only a small fraction of search spaces containing up to 56 million structures, and the subsequent refinement of their geometry lowers the task loss on all tasks while preserving success, through deformations that are functionally interpretable. Once 3D printed, the tools accomplish all tasks on a real robot with the actions found in simulation. Designing tools from required physical effects, rather than a catalog of known tools, is a step toward the open-ended tool making seen in humans and animals.</p>
+</div>
+</div>
+</section>
+<section class="section" id="overview-video">
+<div class="container is-max-desktop">
+<h2 class="title is-3 has-text-centered">Overview</h2>
+<div class="media-placeholder" role="img" aria-label="Project video placeholder">Project video — coming soon</div>
+</div>
+</section>
+<section class="section" id="method">
+<div class="container is-max-desktop">
+<h2 class="title is-3 has-text-centered">Tool Design from Scratch</h2>
+<div class="columns is-vcentered is-multiline">
+<div class="column is-full">
+<figure class="paper-figure"><a href="./static/images/fig_pipeline.png" target="_blank" rel="noopener" aria-label="Open full-size figure: HOT pipeline: BASS structural search with behavioral feedback followed by shape-action refinement."><img src="./static/images/fig_pipeline.png" alt="HOT pipeline: BASS structural search with behavioral feedback followed by shape-action refinement." width="2400" height="922" loading="lazy" decoding="async"></a></figure>
+</div>
+<div class="column is-full content">
+<p class="has-text-centered">Given a physical scene and a desired outcome, HOT jointly determines three coupled elements: <strong>structure</strong> (how primitive components are assembled), <strong>shape</strong> (their continuous geometry), and <strong>action</strong> (how the tool interacts with the scene).</p>
+</div>
+</div>
+</div>
+</section>
+<!-- <section class="section" id="search">
+<div class="container is-max-desktop">
+<h2 class="title is-3 has-text-centered">Behavior-Aware Structural Search (BASS)</h2>
+<div class="content has-text-justified">
+<p>Tools are assembled from a fixed cylindrical handle and a compact library of cuboid primitives using a constructive grammar. Functional groups identify regions that can serve distinct physical roles within one tool.</p>
+<p>Equivalent construction states are merged into a directed acyclic graph (DAG), allowing their observations to contribute to the same behavioral estimate. A partial structure receives evidence from the milestone progress of its evaluated complete descendants, including tools that fail before reaching the final goal.</p>
+<p>Bayesian posterior updates estimate how likely a structural region is to yield a successful tool. A two-query Bayesian lookahead selects where to evaluate next, accounting for both immediate success and how an observation can improve the following search decision.</p>
+<p>The lower-level differentiable simulator, DiffRedMax, optimizes actions using L-BFGS. Task losses combine desired object outcomes, geometric relations, physical interactions, and action regularization.</p>
+</div>
+</div>
+</section> -->
+<section class="section" id="results">
+<div class="container is-max-desktop">
+<h2 class="title is-3 has-text-centered">Simulation Experiments</h2>
+<figure class="paper-figure"><a href="./static/images/fig_sim_res.png" target="_blank" rel="noopener" aria-label="Open full-size figure: Representative successful tool designs before and after refinement, with simulated task rollouts."><img src="./static/images/fig_sim_res.png" alt="Representative successful tool designs before and after refinement, with simulated task rollouts." width="2400" height="1094" loading="lazy" decoding="async"></a></figure>
+<div class="content">
+<p class="has-text-centered">HOT discovers both conventional and unconventional tools for all four tasks, jointly designing their structure, shape, and action from scratch. Further shape–action refinement improves task performance while preserving success.</p>
+</div>
+<div id="simulation-videos" class="simulation-grid my-5">
+<div class="simulation-card has-text-centered" data-task="sweep" data-title="Sweep Balls">
+<h3 class="title is-5 mb-3">Sweep Balls</h3>
+<video id="video-sweep" class="simulation-video" width="1920" height="1080" controls autoplay loop muted playsinline preload="metadata" poster="./static/images/video-posters/sweep-1-stage2.jpg" aria-label="Sweep Balls — Reference">
+<source src="./static/videos/simulation/sweep-1-stage2.mp4" type="video/mp4">
+Your browser does not support embedded video.
+</video>
+<div class="simulation-nav mt-2">
+<button type="button" class="button is-light is-rounded" data-direction="-1" aria-label="Previous tool for Sweep Balls" aria-controls="video-sweep">‹</button>
+<button type="button" class="button is-light is-rounded" data-direction="1" aria-label="Next tool for Sweep Balls" aria-controls="video-sweep">›</button>
+</div>
+</div>
+<div class="simulation-card has-text-centered" data-task="torque" data-title="Torque Bolt">
+<h3 class="title is-5 mb-3">Torque Bolt</h3>
+<video id="video-torque" class="simulation-video" width="1920" height="1080" controls autoplay loop muted playsinline preload="metadata" poster="./static/images/video-posters/torque-1-stage2.jpg" aria-label="Torque Bolt — Reference">
+<source src="./static/videos/simulation/torque-1-stage2.mp4" type="video/mp4">
+Your browser does not support embedded video.
+</video>
+<div class="simulation-nav mt-2">
+<button type="button" class="button is-light is-rounded" data-direction="-1" aria-label="Previous tool for Torque Bolt" aria-controls="video-torque">‹</button>
+<button type="button" class="button is-light is-rounded" data-direction="1" aria-label="Next tool for Torque Bolt" aria-controls="video-torque">›</button>
+</div>
+</div>
+<div class="simulation-card has-text-centered" data-task="scoop" data-title="Scoop Balls">
+<h3 class="title is-5 mb-3">Scoop Balls</h3>
+<video id="video-scoop" class="simulation-video" width="1920" height="1080" controls autoplay loop muted playsinline preload="metadata" poster="./static/images/video-posters/scoop-1-stage2.jpg" aria-label="Scoop Balls — Reference">
+<source src="./static/videos/simulation/scoop-1-stage2.mp4" type="video/mp4">
+Your browser does not support embedded video.
+</video>
+<div class="simulation-nav mt-2">
+<button type="button" class="button is-light is-rounded" data-direction="-1" aria-label="Previous tool for Scoop Balls" aria-controls="video-scoop">‹</button>
+<button type="button" class="button is-light is-rounded" data-direction="1" aria-label="Next tool for Scoop Balls" aria-controls="video-scoop">›</button>
+</div>
+</div>
+<div class="simulation-card has-text-centered" data-task="hammer" data-title="Hammer &amp; Extract Nail">
+<h3 class="title is-5 mb-3">Hammer &amp; Extract Nail</h3>
+<video id="video-hammer" class="simulation-video" width="1920" height="1080" controls autoplay loop muted playsinline preload="metadata" poster="./static/images/video-posters/hammer-1-stage2.jpg" aria-label="Hammer &amp; Extract Nail — Reference">
+<source src="./static/videos/simulation/hammer-1-stage2.mp4" type="video/mp4">
+Your browser does not support embedded video.
+</video>
+<div class="simulation-nav mt-2">
+<button type="button" class="button is-light is-rounded" data-direction="-1" aria-label="Previous tool for Hammer &amp; Extract Nail" aria-controls="video-hammer">‹</button>
+<button type="button" class="button is-light is-rounded" data-direction="1" aria-label="Next tool for Hammer &amp; Extract Nail" aria-controls="video-hammer">›</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="section" id="real-world">
+<div class="container is-max-desktop">
+<h2 class="title is-3 has-text-centered">Real-World Experiments</h2>
+<div class="columns is-vcentered is-multiline">
+<div class="column is-full">
+<div id="real-world-videos" class="simulation-grid my-5">
+<div class="simulation-card has-text-centered" data-task="sweep" data-title="Sweep Balls" data-domain="real-world">
+<h3 class="title is-5 mb-3">Sweep Balls</h3>
+<video id="real-video-sweep" class="simulation-video" width="960" height="720" controls autoplay loop muted playsinline preload="metadata" poster="./static/images/video-posters/real-sweep-1.jpg" aria-label="Sweep Balls — Video 1">
+<source src="./static/videos/real-world/sweep-1.mp4" type="video/mp4">
+Your browser does not support embedded video.
+</video>
+<div class="simulation-nav mt-2">
+<button type="button" class="button is-light is-rounded" data-direction="-1" aria-label="Previous video for Sweep Balls" aria-controls="real-video-sweep">‹</button>
+<button type="button" class="button is-light is-rounded" data-direction="1" aria-label="Next video for Sweep Balls" aria-controls="real-video-sweep">›</button>
+</div>
+</div>
+<div class="simulation-card has-text-centered" data-task="torque" data-title="Torque Bolt" data-domain="real-world">
+<h3 class="title is-5 mb-3">Torque Bolt</h3>
+<video id="real-video-torque" class="simulation-video" width="960" height="720" controls autoplay loop muted playsinline preload="metadata" poster="./static/images/video-posters/real-torque-1.jpg" aria-label="Torque Bolt — Video 1">
+<source src="./static/videos/real-world/torque-1.mp4" type="video/mp4">
+Your browser does not support embedded video.
+</video>
+<div class="simulation-nav mt-2">
+<button type="button" class="button is-light is-rounded" data-direction="-1" aria-label="Previous video for Torque Bolt" aria-controls="real-video-torque">‹</button>
+<button type="button" class="button is-light is-rounded" data-direction="1" aria-label="Next video for Torque Bolt" aria-controls="real-video-torque">›</button>
+</div>
+</div>
+<div class="simulation-card has-text-centered" data-task="scoop" data-title="Scoop Balls" data-domain="real-world">
+<h3 class="title is-5 mb-3">Scoop Balls</h3>
+<video id="real-video-scoop" class="simulation-video" width="960" height="720" controls autoplay loop muted playsinline preload="metadata" poster="./static/images/video-posters/real-scoop-1.jpg" aria-label="Scoop Balls — Video 1">
+<source src="./static/videos/real-world/scoop-1.mp4" type="video/mp4">
+Your browser does not support embedded video.
+</video>
+<div class="simulation-nav mt-2">
+<button type="button" class="button is-light is-rounded" data-direction="-1" aria-label="Previous video for Scoop Balls" aria-controls="real-video-scoop">‹</button>
+<button type="button" class="button is-light is-rounded" data-direction="1" aria-label="Next video for Scoop Balls" aria-controls="real-video-scoop">›</button>
+</div>
+</div>
+<div class="simulation-card has-text-centered" data-task="hammer" data-title="Hammer &amp; Extract Nail" data-domain="real-world">
+<h3 class="title is-5 mb-3">Hammer &amp; Extract Nail</h3>
+<video id="real-video-hammer" class="simulation-video" width="960" height="720" controls autoplay loop muted playsinline preload="metadata" poster="./static/images/video-posters/real-hammer-1.jpg" aria-label="Hammer &amp; Extract Nail — Video 1">
+<source src="./static/videos/real-world/hammer-1.mp4" type="video/mp4">
+Your browser does not support embedded video.
+</video>
+<div class="simulation-nav mt-2">
+<button type="button" class="button is-light is-rounded" data-direction="-1" aria-label="Previous video for Hammer &amp; Extract Nail" aria-controls="real-video-hammer">‹</button>
+<button type="button" class="button is-light is-rounded" data-direction="1" aria-label="Next video for Hammer &amp; Extract Nail" aria-controls="real-video-hammer">›</button>
+</div>
+</div>
+</div>
+</div>
+<div class="column is-full content">
+<p class="has-text-centered">The optimized tools are 3D printed and mounted on a 7-DOF RealMan RM75-B arm.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="section" id="Ack">
+<div class="container is-max-desktop">
+<h2 class="title is-3 has-text-centered">Acknowledgement</h2>
+<div class="content">
+<p>This work is supported in part by the Brain Science and Brain-like Intelligence Technology—National Science and Technology Major Project (2025ZD0219400), the Beijing Natural Science Foundation (QY26049), the National Natural Science Foundation of China (62376009), the Beijing Nova program, the NVIDIA Academic Grant Program using Spark and Thor, the State Key Lab of General AI at Peking University, the PKU-BingJi Joint Laboratory for Artificial Intelligence, the Wuhan Major Scientific and Technological Special Program (2025060902020304), the Hubei Embodied Intelligence Foundation Model Research and Development Program, and the National Comprehensive Experimental Base for Governance of Intelligent Society, Wuhan East Lake High-Tech Development Zone. We thank Ms. Hailu Yang (PKU), Ms. Qing Gao (PKU), and Lulin Huang (PKU) for their assistance.</p>
+</div>
+</div>
+</section>
+<footer class="footer">
+<div class="container">
+<div class="columns is-centered">
+<div class="column is-8">
+<div class="content">
+<p>This website is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.</p>
+<p>Template borrowed from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>.</p>
+</div>
+</div>
+</div>
+</div></footer>
+
+
+</body>
+</html>

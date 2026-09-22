@@ -1,0 +1,47 @@
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('../fonts/linux-libertine/LinLibertine_R.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('../fonts/linux-libertine/LinLibertine_RI.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('../fonts/linux-libertine/LinLibertine_RZ.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('../fonts/linux-libertine/LinLibertine_RZI.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('../fonts/linux-libertine/LinLibertine_RB.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Linux Libertine';
+  src: url('../fonts/linux-libertine/LinLibertine_RBI.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Leave icon-font classes intact while applying Libertine to all page text. */
+body, button, input, optgroup, select, textarea, pre, code {
+  font-family: 'Linux Libertine', 'Times New Roman', serif;
+}

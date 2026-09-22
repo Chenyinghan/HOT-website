@@ -1,0 +1,10 @@
+/* Short-handled wrench. The click hotspot is at the upper-left jaw tip. */
+@media (hover: hover) and (pointer: fine) {
+  html, body {
+    cursor: url('../images/cursor/torque-wrench-v2-40.png') 9 2, auto;
+  }
+
+  a, button:not(:disabled), [role="button"] {
+    cursor: url('../images/cursor/torque-wrench-v2-40.png') 9 2, pointer;
+  }
+}

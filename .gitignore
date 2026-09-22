@@ -1,0 +1,63 @@
+# Private paper sources and original research assets
+/ICRA27_HOT/
+/icra27_hot_assets/
+
+# Local agent/editor configuration and deployment helpers (unused by GitHub Pages)
+/.agents/
+/.codex/
+/.claude/
+/.idea/
+/.vscode/
+/functions/
+
+# Credentials and local environment settings
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies, caches, logs, and temporary files
+node_modules/
+__pycache__/
+*.py[cod]
+.cache/
+.wrangler/
+.vercel/
+.netlify/
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Internal video provenance / processing notes
+/static/videos/**/sources.json
+
+# Cursor generation prompts and unused variants; keep the deployed cursor
+/static/images/cursor/*
+!/static/images/cursor/torque-wrench-v2-40.png
+
+# Retired intro video and frame sequences
+/static/videos/teaser.mp4
+/static/images/teaser/
+
+# Figures removed from the website
+/static/images/fig_real_res.png
+/static/images/fig_milestones.png
+
+# Unused theme, vendor scripts, and development source maps
+/static/css/theme.css
+/static/js/bulma-carousel.js
+/static/js/bulma-carousel.min.js
+/static/js/bulma-slider.js
+/static/js/bulma-slider.min.js
+*.map
+*.map.txt
