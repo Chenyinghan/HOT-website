@@ -7,9 +7,20 @@ document.addEventListener('DOMContentLoaded', function () {
       button.setAttribute('aria-expanded', String(active));
     });
   });
+  // Only decode task videos while visible, leaving resources for the intro.
+  const videoObserver = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) entry.target.play().catch(function () {});
+      else entry.target.pause();
+    });
+  }, { threshold: 0 }) : null;
   document.querySelectorAll('.simulation-card').forEach(function (card) {
     const video = card.querySelector('video');
-    // The second wrench is also conventional in the paper, despite its source folder name.
+    if (videoObserver) {
+      video.autoplay = false;
+      video.pause();
+      videoObserver.observe(video);
+    }
     const isRealWorld = card.dataset.domain === 'real-world';
     const variants = isRealWorld ? ['Video 1', 'Video 2'] : ['Reference', card.dataset.task === 'torque' ? 'Alternative' : 'Creative'];
     let current = 0;

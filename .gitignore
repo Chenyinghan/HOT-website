@@ -61,3 +61,13 @@ Thumbs.db
 /static/js/bulma-slider.min.js
 *.map
 *.map.txt
+
+# Original 4K masters; the website uses static/videos/intro/
+/static/videos/*_4K60.mp4
+
+# Unused carousel and slider styles
+/static/css/bulma-carousel.min.css
+/static/css/bulma-slider.min.css
+
+# Font Awesome uses the SVG/JS bundle, not the webfont stylesheet
+/static/css/fontawesome.all.min.css

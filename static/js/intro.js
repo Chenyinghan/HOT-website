@@ -8,14 +8,18 @@
   const playButton = intro.querySelector('.intro-play');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const clips = [
-    { src: '01_Layers_4K60.mp4', text: 'Joint design of tool structure, shape, and action.' },
-    { src: '02_HOT_4K60.mp4', text: 'HOT: Hierarchical Optimization for Tool Design.' },
-    { src: '03_Assets_4K60.mp4', text: 'Functional tools constructed from geometric primitives.' },
-    { src: '04_Tasks_4K60.mp4', text: 'Tools designed for physical goals: Sweep Balls, Hammer & Extract Nail, Torque Bolt, and Scoop Balls.' }
+    // The layers and HOT form one introduction, without a caption break.
+    { src: 'intro/01_Layers_1080p60.mp4', text: null },
+    { src: 'intro/02_HOT_1080p60.mp4', text: 'HOT designs robot tools for a task by optimizing their structures, shapes, and actions.' },
+    { src: 'intro/03_Assets_1080p60.mp4', text: 'Starting with simple primitives, HOT builds tools and tests how they work.' },
+    { src: 'intro/04_Tasks_1080p60.mp4', captionAt: 1, text: 'Tools designed for physical goals: Sweep Balls, Hammer & Extract Nail, Torque Bolt, and Scoop Balls.' }
   ];
-  const readingDuration = 1500;
+  const readingDuration = 3000;
+  const minimumReadingDuration = 1500;
   const fadeDuration = 450;
-  let active = !window.location.hash && !reducedMotion.matches;
+  const seen = document.documentElement.classList.contains('intro-seen');
+  const replayButton = document.querySelector('.intro-replay');
+  let active = !seen && !window.location.hash && !reducedMotion.matches;
   let current = -1;
   let phase = 'idle';
   let queued = false;
@@ -34,6 +38,12 @@
   function hideNote() {
     intro.classList.remove('has-note');
     note.setAttribute('aria-hidden', 'true');
+  }
+  function showNote() {
+    if (intro.classList.contains('has-note')) return;
+    noteText.textContent = clips[current].text;
+    note.setAttribute('aria-hidden', 'false');
+    intro.classList.add('has-note');
   }
   function prepare(index) {
     if (index >= clips.length) return;
@@ -57,21 +67,52 @@
     hideNote();
     setPhase('done');
   }
+  function finishDemo() {
+    try {
+      document.cookie = 'hot_intro_seen=1; Max-Age=31536000; Path=/; SameSite=Lax' +
+        (location.protocol === 'https:' ? '; Secure' : '');
+    } catch (error) { /* Blocking cookies must not prevent navigation. */ }
+    stop();
+    intro.hidden = true;
+    document.documentElement.classList.add('intro-seen');
+    const paper = document.getElementById('paper');
+    paper.scrollIntoView({ behavior: 'instant' });
+    paper.focus({ preventScroll: true });
+  }
+  function replayDemo() {
+    stop();
+    // Clear the fragment without firing hashchange, which would stop playback.
+    history.replaceState(history.state, '', location.pathname + location.search);
+    intro.hidden = false;
+    document.documentElement.classList.remove('intro-seen');
+    current = -1;
+    remaining = readingDuration;
+    touchY = null;
+    videos.forEach((video, index) => {
+      video.controls = false;
+      video.classList.toggle('is-active', index === 0);
+      video.setAttribute('aria-hidden', String(index !== 0));
+      delete video.dataset.clip;
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    intro.querySelector('.intro-skip').focus({ preventScroll: true });
+    active = true;
+    setPhase('idle');
+    prepare(1);
+    startClip(0);
+  }
   function enterPaper() {
     const paper = document.getElementById('paper');
     const stage = intro.querySelector('.intro-stage');
     const hero = paper.nextElementSibling;
     if (reducedMotion.matches || !stage.animate) {
-      stop();
-      paper.scrollIntoView({ behavior: 'instant' });
-      paper.focus({ preventScroll: true });
+      finishDemo();
       return;
     }
     setPhase('exiting');
     queued = false;
     videos.forEach(video => video.pause());
-    // Keep the actual last video frame over the viewport while positioning the
-    // real article behind it. No screenshot, duplicate content, or white flash.
+    // Hold the last frame over the viewport while positioning the article beneath it.
     intro.classList.add('is-exiting');
     paper.scrollIntoView({ behavior: 'instant' });
     const easing = 'cubic-bezier(.65, 0, .25, 1)';
@@ -95,8 +136,7 @@
     ];
     Promise.all(exitAnimations.map(animation => animation.finished)).then(() => {
       if (phase !== 'exiting') return;
-      stop();
-      paper.focus({ preventScroll: true });
+      finishDemo();
     }).catch(() => { /* Skip intro or a motion-preference change cancels cleanly. */ });
   }
   function fallback() {
@@ -138,7 +178,7 @@
     if (!active || phase !== 'reading') return;
     remaining = 0;
     setPhase('ready');
-    if (queued) startClip(current + 1);
+    startClip(current + 1);
   }
   function scheduleReading() {
     clearTimeout(readingTimer);
@@ -150,7 +190,13 @@
     if (!active) return;
     if (phase === 'idle' || phase === 'ready') startClip(current + 1);
     else if (phase === 'loading' && !playButton.hidden) playCurrent();
-    else if (phase === 'reading') queued = true;
+    else if (phase === 'reading' && !queued) {
+      queued = true;
+      // A scroll can advance sooner, but always allow time to read the caption.
+      const elapsed = document.hidden ? 0 : performance.now() - readingStarted;
+      remaining = Math.max(0, remaining - elapsed - (readingDuration - minimumReadingDuration));
+      scheduleReading();
+    }
     // Scroll momentum during playback never fast-forwards or skips a clip.
   }
 
@@ -168,14 +214,22 @@
         if (!selected) other.pause();
       });
       setPhase('playing');
-      // Decode the next clip behind the current one; switch only after it starts.
+      // Preload the next clip; reveal it only after playback starts.
       prepare(current + 1);
+    });
+    video.addEventListener('timeupdate', () => {
+      if (!active || phase !== 'playing' || video !== videos[current % 2]) return;
+      const clip = clips[current];
+      // Follow actual playback time so buffering does not reveal the caption early.
+      if (clip.captionAt !== undefined && video.currentTime >= clip.captionAt) showNote();
     });
     video.addEventListener('ended', () => {
       if (!active || phase !== 'playing' || video !== videos[current % 2]) return;
-      noteText.textContent = clips[current].text;
-      note.setAttribute('aria-hidden', 'false');
-      intro.classList.add('has-note');
+      if (!clips[current].text) {
+        startClip(current + 1);
+        return;
+      }
+      showNote();
       remaining = readingDuration + fadeDuration;
       setPhase('reading');
       scheduleReading();
@@ -185,7 +239,14 @@
     });
   });
   playButton.addEventListener('click', playCurrent);
-  intro.querySelector('.intro-skip').addEventListener('click', stop);
+  intro.querySelector('.intro-skip').addEventListener('click', event => {
+    event.preventDefault();
+    finishDemo();
+  });
+  if (replayButton) {
+    replayButton.hidden = false;
+    replayButton.addEventListener('click', replayDemo);
+  }
   window.addEventListener('hashchange', stop);
   reducedMotion.addEventListener('change', fallback);
   document.addEventListener('visibilitychange', () => {
@@ -228,6 +289,7 @@
       requestNext();
     }
   }, { passive: true });
+  if (seen) intro.hidden = true;
   setPhase(active ? 'idle' : 'done');
   if (active) {
     prepare(1);
