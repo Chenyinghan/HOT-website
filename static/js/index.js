@@ -1,12 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.navbar-burger').forEach(function (button) {
-    button.addEventListener('click', function () {
-      const menu = document.getElementById(button.getAttribute('aria-controls'));
-      const active = button.classList.toggle('is-active');
-      if (menu) menu.classList.toggle('is-active', active);
-      button.setAttribute('aria-expanded', String(active));
-    });
-  });
   // Only decode task videos while visible, leaving resources for the intro.
   const videoObserver = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
